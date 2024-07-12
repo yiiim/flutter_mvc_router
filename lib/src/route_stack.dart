@@ -23,6 +23,7 @@ class MvcRouteStack extends ValueNotifier<List<MvcRouteEntity>> implements MvcRo
   MvcRouteStack? _parent;
   MvcRouteStack? _branchParent;
   bool isRoot = false;
+  GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   MvcRouteStack(super._value, this.parser, {this.key, this.id});
   factory MvcRouteStack.fromResult(MvcRouteMapParseResult result, MvcRouterParser parser) {
     List<MvcRouteEntity> enities = [];

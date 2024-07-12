@@ -18,7 +18,7 @@ class MvcRouteInformationParser extends RouteInformationParser<MvcRouteMapBase> 
     if (routeInformation.state is String) {
       final informationStringState = routeInformation.state as String;
       if (informationStringState.startsWith("MvcRouteInformationParser")) {
-        final serializedData = informationStringState.substring("MvcRouteInformationParser".length);
+        final serializedData = informationStringState.substring("MvcRouteInformationParser".length + 1);
         result = getService<MvcRouterSerializerManager>().deserializationRouteMap(serializedData);
         if (result != null) {
           restore = true;

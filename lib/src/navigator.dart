@@ -79,12 +79,13 @@ class MvcNavigatorController extends MvcController<MvcRouteStack> {
         }
         return MvcBuilder(
           id: model.id,
-          classes: ["mvc_navigator"],
+          classes: const ["mvc_navigator"],
           builder: (context) {
             return Column(
               children: [
                 Expanded(
                   child: Navigator(
+                    key: model.navigatorKey,
                     pages: _pages!,
                     onPopPage: (route, result) {
                       if (!route.didPop(result)) {

@@ -15,7 +15,7 @@ class DefaultMvcRouteMapSerializer extends RouteMapSerializer<MvcBasicRouteMap> 
   @override
   MvcBasicRouteMap? deserialization(dynamic serializedData) {
     try {
-      final data = jsonDecode((serializedData as String).substring("MvcDefaultRouteMap:".length));
+      final data = jsonDecode((serializedData as String).substring("MvcDefaultRouteMap:".length + 1));
       return MvcBasicRouteMap(data.map((e) => MvcRouteUriMapDataSerializer().deserialization(jsonEncode(e))).toList());
     } catch (e) {
       return null;
