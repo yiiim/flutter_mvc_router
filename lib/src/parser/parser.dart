@@ -3,35 +3,39 @@ import 'dart:async';
 import 'package:flutter_mvc/flutter_mvc.dart';
 
 import '../middleware/middleware.dart';
-import '../router/base.dart';
 import '../route_map/base.dart';
 import '../route_map/map_data/base.dart';
+import 'map_parser.dart';
 import 'result.dart';
 
 class MvcRouterParser with DependencyInjectionService {
   final List<Type> middlewareTypes = [];
-  late MvcRouterBase defaultRouter = getService<MvcRouterBase>();
+  late final MvcRouterMapParser _defaultMapParser = getService<MvcRouterMapParser>();
 
-  FutureOr<MvcRouteMapParseResult> parseRouteMap(MvcRouteMapBase map, {bool restore = false}) async {
-    final list = <MvcRouteMapDataParseResult>[];
-    for (var i = 0; i < map.length; i++) {
-      list.add(await _parseRouteMapData(map.dataAtIndex(i), defaultRouter, restore: restore));
+  FutureOr<MvcRouterMapParseResult> parseRouteMap(
+    MvcRouterMapBase map, {
+    bool restore = false,
+    MvcRouterMapParser? mapParser,
+  }) async {
+    final list = <MvcRouterMapPathParseResult>[];
+    for (var element in map.paths) {
+      list.add(await _parseRouteMapData(map, element, mapParser ?? _defaultMapParser, restore: restore));
     }
-    return MvcRouteMapParseResult(
+    return MvcRouterMapParseResult(
       map: map,
-      results: list,
+      paths: list,
       key: map.key,
       id: map.id,
     );
   }
 
-  FutureOr<MvcRouteMapDataParseResult> parseRouteMapData(MvcRouteMapDataBase mapData, {MvcRouterBase? router, bool restore = false}) async {
-    return _parseRouteMapData(mapData, router ?? defaultRouter, restore: restore);
+  FutureOr<MvcRouterMapPathParseResult> parseRouteMapData(MvcRouterMapBase map, MvcRouterMapPathBase mapData, {MvcRouterMapParser? mapParser, bool restore = false}) async {
+    return _parseRouteMapData(map, mapData, mapParser ?? _defaultMapParser, restore: restore);
   }
 
-  FutureOr<MvcRouteMapDataParseResult> _parseRouteMapData(MvcRouteMapDataBase mapData, MvcRouterBase router, {bool restore = false}) async {
-    final context = await router.createRouteParseContext(mapData, restore: restore);
-    RouteHandler routerHander = router.parseRoute;
+  FutureOr<MvcRouterMapPathParseResult> _parseRouteMapData(MvcRouterMapBase map, MvcRouterMapPathBase mapData, MvcRouterMapParser mapParser, {bool restore = false}) async {
+    final context = await mapParser.createParseContext(map, mapData, restore: restore);
+    RouteHandler routerHander = mapParser.parseRoute;
     for (var element in middlewareTypes) {
       routerHander = (getServiceByType(element) as MvcRouterMiddleware).middleware(routerHander);
     }

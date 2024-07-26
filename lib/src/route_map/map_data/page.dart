@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../route/page.dart';
 import 'uri.dart';
 
-class MvcRoutePageMapData<T> extends MvcRouteUriMapData {
-  MvcRoutePageMapData({
+class MvcRouterPagePath<T> extends MvcRouterUriPath {
+  MvcRouterPagePath({
     required super.matchedPath,
     required super.remainingLocation,
     required super.matchedLocation,
@@ -13,17 +13,17 @@ class MvcRoutePageMapData<T> extends MvcRouteUriMapData {
     super.arguments,
     super.key,
   });
-  static MvcRoutePageMapData fromController<T extends MvcPageController>({
+  static MvcRouterPagePath fromController<T extends MvcPageController>({
     dynamic arguments,
     String? path,
     LocalKey? key,
   }) {
-    return MvcRoutePageMapData<T>(
+    return MvcRouterPagePath<T>(
       matchedPath: "",
       remainingLocation: "$T",
       matchedLocation: "",
       pathParameters: {},
-      uri: Uri.parse(path ?? "$T"),
+      uri: path != null ? Uri.parse(path) : null,
       arguments: arguments,
       key: key ?? ValueKey(T),
     );
@@ -45,8 +45,8 @@ class MvcRoutePageMapData<T> extends MvcRouteUriMapData {
         if (arguments is Map<String, dynamic>) ...arguments,
       };
   @override
-  MvcRouteUriMapData copyWith({String? matchedPath, String? remainingLocation, String? matchedLocation, Map<String, String>? pathParameters, Uri? uri, dynamic arguments}) {
-    return MvcRoutePageMapData(
+  MvcRouterUriPath copyWith({String? matchedPath, String? remainingLocation, String? matchedLocation, Map<String, String>? pathParameters, Uri? uri, dynamic arguments}) {
+    return MvcRouterPagePath(
       matchedPath: matchedPath ?? this.matchedPath,
       remainingLocation: remainingLocation ?? this.remainingLocation,
       matchedLocation: matchedLocation ?? this.matchedLocation,

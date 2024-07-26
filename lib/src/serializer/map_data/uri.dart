@@ -3,17 +3,17 @@ import 'dart:convert';
 import '../../route_map/map_data/uri.dart';
 import '../serializer.dart';
 
-class MvcRouteUriMapDataSerializer extends RouteMapDataSerializer<MvcRouteUriMapData> {
+class MvcRouteUriMapDataSerializer extends RouteMapDataSerializer<MvcRouterUriPath> {
   @override
   bool canDeserialization(dynamic serializedData) {
     return serializedData is String && serializedData.startsWith("MvcRouteUriMapData:");
   }
 
   @override
-  MvcRouteUriMapData? deserialization(dynamic serializedData) {
+  MvcRouterUriPath? deserialization(dynamic serializedData) {
     try {
       final data = jsonDecode((serializedData as String).substring("MvcRouteUriMapData:".length + 1));
-      return MvcRouteUriMapData(
+      return MvcRouterUriPath(
         matchedPath: data["matchedPath"],
         remainingLocation: data["remainingLocation"],
         matchedLocation: data["matchedLocation"],
@@ -26,7 +26,7 @@ class MvcRouteUriMapDataSerializer extends RouteMapDataSerializer<MvcRouteUriMap
   }
 
   @override
-  dynamic serialization(MvcRouteUriMapData routeMapData) {
+  dynamic serialization(MvcRouterUriPath routeMapData) {
     Map data = {
       "matchedPath": routeMapData.matchedPath,
       "remainingLocation": routeMapData.remainingLocation,

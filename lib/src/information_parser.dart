@@ -9,11 +9,11 @@ import 'serializer/manager.dart';
 import 'route_stack.dart';
 import 'parser/parser.dart';
 
-class MvcRouteInformationParser extends RouteInformationParser<MvcRouteMapBase> with DependencyInjectionService {
+class MvcRouteInformationParser extends RouteInformationParser<MvcRouterMapBase> with DependencyInjectionService {
   late final MvcRouterParser parser = getService<MvcRouterParser>();
   @override
-  Future<MvcRouteMapBase> parseRouteInformationWithDependencies(RouteInformation routeInformation, BuildContext context) async {
-    MvcRouteMapBase? result;
+  Future<MvcRouterMapBase> parseRouteInformationWithDependencies(RouteInformation routeInformation, BuildContext context) async {
+    MvcRouterMapBase? result;
     bool restore = false;
     if (routeInformation.state is String) {
       final informationStringState = routeInformation.state as String;
@@ -26,10 +26,10 @@ class MvcRouteInformationParser extends RouteInformationParser<MvcRouteMapBase> 
       }
     }
     if (result == null) {
-      if (routeInformation.state is MvcRouteMapBase) {
-        result = routeInformation.state as MvcRouteMapBase;
+      if (routeInformation.state is MvcRouterMapBase) {
+        result = routeInformation.state as MvcRouterMapBase;
       } else {
-        result ??= getService<MvcRouterDelegate>().initialRouteMap;
+        result ??= getService<MvcRouterDelegate>().rootRouteMap;
       }
     }
     if (result is! MvcRouteStack) {
@@ -42,7 +42,7 @@ class MvcRouteInformationParser extends RouteInformationParser<MvcRouteMapBase> 
   }
 
   @override
-  RouteInformation? restoreRouteInformation(MvcRouteMapBase configuration) {
+  RouteInformation? restoreRouteInformation(MvcRouterMapBase configuration) {
     return RouteInformation(
       uri: configuration.uri,
       state: "MvcRouteInformationParser${configuration.serialization()}",

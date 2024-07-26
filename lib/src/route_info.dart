@@ -10,7 +10,7 @@ class MvcRouteInfo {
     this.child,
   });
   final MvcRouteBase route;
-  final MvcRouteMapDataBase routeData;
+  final MvcRouterMapPathBase routeData;
   final Widget? child;
 
   T? args<T>() => routeData.args<T>();

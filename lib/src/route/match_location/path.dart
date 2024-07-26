@@ -1,5 +1,6 @@
-import '../../parser/context.dart';
-import '../../route_map/map_data/uri.dart';
+import 'package:flutter_mvc_router/src/route_map/map_data/base.dart';
+import 'package:flutter_mvc_router/src/route_map/map_data/uri.dart';
+
 import 'match_location.dart';
 
 class RoutePathMatchLocation extends MvcRouteMatchedLocation {
@@ -8,13 +9,11 @@ class RoutePathMatchLocation extends MvcRouteMatchedLocation {
   final Map<String, String> pathParameters;
 
   @override
-  MvcRouterParseContext consumeMatchedLocationInContext(MvcRouterParseContext context) {
-    assert(context.mapData is MvcRouteUriMapData);
-    return context.change(
-      mapData: (context.mapData as MvcRouteUriMapData).removeLocation(location)
-        ..copyWith(
-          pathParameters: pathParameters,
-        ),
-    );
+  MvcRouterMapPathBase consumeMatchedLocation(MvcRouterMapPathBase path) {
+    assert(path is MvcRouterUriPath);
+    return (path as MvcRouterUriPath).removeLocation(location)
+      ..copyWith(
+        pathParameters: pathParameters,
+      );
   }
 }

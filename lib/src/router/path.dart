@@ -1,27 +1,26 @@
 import 'dart:async';
 
 import 'package:flutter_mvc/flutter_mvc.dart';
-import 'package:flutter_mvc_router/src/route_map/base.dart';
 
-import '../../route_map/map_data/base.dart';
-import '../../route_map/map_data/named.dart';
+import '../route_map/map_data/base.dart';
+import '../route_map/map_data/named.dart';
 import 'basic.dart';
 
 mixin MvcPathRouter on MvcBasicRouter, DependencyInjectionService {
   FutureOr<T?> pushNamed<T>(String name, {dynamic arguments}) {
-    return pushRoute<T>(MvcRouteNamedMapData.fromNamed(name, arguments));
+    return pushRoute<T>(MvcRouterNamedPath.fromNamed(name, arguments));
   }
 
   FutureOr<T?> pushNamedReplacement<T>(String name, {dynamic arguments, dynamic result}) {
     return pushRouteReplacement(
-      MvcRouteNamedMapData.fromNamed(name, arguments),
+      MvcRouterNamedPath.fromNamed(name, arguments),
       result,
     );
   }
 
-  FutureOr<T?> pushNamedAndRemoveUntil<T>(String name, bool Function(MvcRouteMapDataBase) predicate, {dynamic arguments, dynamic result}) {
+  FutureOr<T?> pushNamedAndRemoveUntil<T>(String name, bool Function(MvcRouterMapPathBase) predicate, {dynamic arguments, dynamic result}) {
     return pushRouteAndRemoveUntil(
-      MvcRouteNamedMapData.fromNamed(name, arguments),
+      MvcRouterNamedPath.fromNamed(name, arguments),
       predicate,
       result,
     );
@@ -29,7 +28,7 @@ mixin MvcPathRouter on MvcBasicRouter, DependencyInjectionService {
 
   void popUntilNamed(String name) {
     popRouteUntil((data) {
-      if (data is MvcRouteNamedMapData) {
+      if (data is MvcRouterNamedPath) {
         return data.name == name;
       }
       return false;
@@ -39,16 +38,12 @@ mixin MvcPathRouter on MvcBasicRouter, DependencyInjectionService {
   void redirectNamed(
     String name, {
     dynamic arguments,
-    int? branchCurrentIndex,
-    List<MvcRouteMapBase>? branches,
     dynamic extraData,
   }) {
     redirectRoute(
-      MvcRouteNamedMapData.fromNamed(
+      MvcRouterNamedPath.fromNamed(
         name,
         arguments,
-        branchCurrentIndex: branchCurrentIndex,
-        branches: branches,
         extraData: extraData,
       ),
     );

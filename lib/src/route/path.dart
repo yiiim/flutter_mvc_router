@@ -12,21 +12,21 @@ import 'route.dart';
 typedef MvcPathRouteBuilder = Widget Function(BuildContext context, MvcRouteInfo routeInfo, Widget? child);
 typedef MvcPathRoutePageFactory = MvcPage Function();
 
-class MvcPathRoute extends MvcRouteBase with MvcContainerRouteMixin {
+class MvcPathRoute extends MvcRouteBase {
   MvcPathRoute({
     required this.path,
     this.builder,
     this.pageFactory,
-    this.children = const <MvcRouteBase>[],
   }) {
     _pathRegExp = patternToRegExp(path, pathParameters);
   }
   final String path;
   final List<String> pathParameters = <String>[];
-  @override
-  final List<MvcRouteBase> children;
   final MvcPathRouteBuilder? builder;
   final MvcPathRoutePageFactory? pageFactory;
+
+  @override
+  Uri? get uri => Uri(path: path);
 
   @override
   MvcPage createPage() {
@@ -40,10 +40,10 @@ class MvcPathRoute extends MvcRouteBase with MvcContainerRouteMixin {
 
   @override
   MvcRouteMatchedLocation? match(MvcRouterParseContext context) {
-    if (context.mapData is! MvcRouteUriMapData) {
+    if (context.mapData is! MvcRouterUriPath) {
       return null;
     }
-    MvcRouteUriMapData mapData = context.mapData as MvcRouteUriMapData;
+    MvcRouterUriPath mapData = context.mapData as MvcRouterUriPath;
     final RegExpMatch? regExpMatch = _matchPatternAsPrefix(mapData.remainingLocation);
     if (regExpMatch == null) {
       return null;

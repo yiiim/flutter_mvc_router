@@ -1,13 +1,25 @@
+import 'package:flutter_mvc_router/src/route/route.dart';
+import 'package:flutter_mvc_router/src/route_map/base.dart';
+
 import '../route_map/map_data/base.dart';
-import 'user_info.dart';
 
-class MvcRouterParseContext<T extends MvcRouterParseUserInfo> {
-  MvcRouterParseContext({required this.mapData, this.userInfo});
-  final MvcRouteMapDataBase mapData;
-  final T? userInfo;
+class MvcRouterParseContext {
+  MvcRouterParseContext({
+    required this.map,
+    required this.mapData,
+    this.userInfo = const {},
+  });
+  final MvcRouterMapBase map;
+  final MvcRouterMapPathBase mapData;
+  final Map userInfo;
 
-  MvcRouterParseContext change({MvcRouteMapDataBase? mapData, T? userInfo}) {
+  MvcRouterParseContext change({
+    MvcRouterMapPathBase? mapData,
+    List<MvcRouteBase>? routes,
+    Map? userInfo,
+  }) {
     MvcRouterParseContext newContext = MvcRouterParseContext(
+      map: map,
       mapData: mapData ?? this.mapData,
       userInfo: userInfo ?? this.userInfo,
     );

@@ -1,9 +1,13 @@
+import 'package:flutter/material.dart';
+
 import 'base.dart';
 
-class MvcEmptyRouteMapData extends MvcRouteMapDataBase {
-  MvcEmptyRouteMapData();
+class MvcRouterEmptyPath extends MvcRouterMapPathBase {
+  MvcRouterEmptyPath() : super(key: UniqueKey());
   @override
   bool get isEmpty => true;
   @override
   Uri get uri => Uri.parse("");
+  @override
+  String serialization() => "";
 }

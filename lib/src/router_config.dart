@@ -3,7 +3,7 @@ import 'package:flutter_mvc/flutter_mvc.dart';
 
 import 'route_map/base.dart';
 
-class MvcRouterConfig extends RouterConfig<MvcRouteMapBase> with DependencyInjectionService {
+class MvcRouterConfig extends RouterConfig<MvcRouterMapBase> with DependencyInjectionService {
   MvcRouterConfig({
     super.routeInformationProvider,
     super.routeInformationParser,

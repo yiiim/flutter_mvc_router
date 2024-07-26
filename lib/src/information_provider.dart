@@ -24,7 +24,16 @@ class MvcRouteInformationProvider extends RouteInformationProvider with ChangeNo
 
   @override
   FutureOr dependencyInjectionServiceInitialize() {
-    final initialRouteMap = getService<MvcRouterDelegate>().initialRouteMap;
+    // Uri platformDefaultUri = Uri.parse(
+    //   WidgetsBinding.instance.platformDispatcher.defaultRouteName,
+    // );
+    // if (platformDefaultUri.hasEmptyPath) {
+    //   platformDefaultUri = Uri(
+    //     path: '/',
+    //     queryParameters: platformDefaultUri.queryParameters,
+    //   );
+    // }
+    final initialRouteMap = getService<MvcRouterDelegate>().rootRouteMap;
     _value = RouteInformation(uri: initialRouteMap.uri, state: initialRouteMap);
   }
 }

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-
-import '../parser/context.dart';
-import '../page.dart';
-import '../route_info.dart';
-import 'match_location/match_location.dart';
+import 'package:flutter_mvc_router/flutter_mvc_router.dart';
 
 abstract class MvcRouteBase {
+  MvcRouteBase();
+
+  Uri? get uri;
+
   MvcPage createPage();
   MvcRouteMatchedLocation? match(MvcRouterParseContext context) => null;
 }
 
-mixin MvcContainerRouteMixin on MvcRouteBase {
-  List<MvcRouteBase> get children;
+abstract class MvcBranchedRouteBase {
+  List<MvcRouterMapBase> branchesDefaultMap();
+  int? mapIndex(MvcRouterMapBase map);
 }
 
 class MvcNotFoundRoute extends MvcRouteBase {
@@ -22,4 +23,7 @@ class MvcNotFoundRoute extends MvcRouteBase {
   MvcPage createPage() {
     return MvcBuilderPage(builder ?? (context, routeInfo, child) => const Center(child: Text("Not Found")));
   }
+
+  @override
+  Uri? get uri => null;
 }

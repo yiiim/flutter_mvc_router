@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../base.dart';
 import 'uri.dart';
 
-class MvcRouteNamedMapData extends MvcRouteUriMapData {
-  MvcRouteNamedMapData(
+class MvcRouterNamedPath extends MvcRouterUriPath {
+  MvcRouterNamedPath(
     this.name, {
     super.arguments,
     super.key,
@@ -13,20 +12,16 @@ class MvcRouteNamedMapData extends MvcRouteUriMapData {
     required super.remainingLocation,
     required super.matchedLocation,
     required super.pathParameters,
-    super.branchCurrentIndex,
-    super.branches,
     super.extraData,
   });
-  factory MvcRouteNamedMapData.fromNamed(
+  factory MvcRouterNamedPath.fromNamed(
     String name,
     dynamic arguments, {
     LocalKey? key,
-    int? branchCurrentIndex,
-    List<MvcRouteMapBase>? branches,
     dynamic extraData,
   }) {
     Uri uri = Uri.parse(name);
-    return MvcRouteNamedMapData(
+    return MvcRouterNamedPath(
       name,
       key: key,
       arguments: arguments,
@@ -35,8 +30,6 @@ class MvcRouteNamedMapData extends MvcRouteUriMapData {
       remainingLocation: uri.path,
       matchedLocation: "",
       pathParameters: {},
-      branchCurrentIndex: branchCurrentIndex,
-      branches: branches,
       extraData: extraData,
     );
   }
@@ -56,8 +49,8 @@ class MvcRouteNamedMapData extends MvcRouteUriMapData {
         if (arguments is Map<String, dynamic>) ...arguments,
       };
   @override
-  MvcRouteUriMapData copyWith({String? name, dynamic arguments, String? matchedPath, String? remainingLocation, String? matchedLocation, Map<String, String>? pathParameters, Uri? uri}) {
-    return MvcRouteNamedMapData(
+  MvcRouterUriPath copyWith({String? name, dynamic arguments, String? matchedPath, String? remainingLocation, String? matchedLocation, Map<String, String>? pathParameters, Uri? uri}) {
+    return MvcRouterNamedPath(
       name ?? this.name,
       arguments: arguments ?? this.arguments,
       matchedPath: matchedPath ?? this.matchedPath,

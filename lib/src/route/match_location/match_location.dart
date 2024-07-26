@@ -1,22 +1,20 @@
-import '../../parser/context.dart';
-import '../../route_map/map_data/empty.dart';
+import 'package:flutter_mvc_router/src/route_map/map_data/base.dart';
+import 'package:flutter_mvc_router/src/route_map/map_data/empty.dart';
 
 abstract class MvcRouteMatchedLocation {
-  MvcRouterParseContext consumeMatchedLocationInContext(MvcRouterParseContext context);
+  MvcRouterMapPathBase consumeMatchedLocation(MvcRouterMapPathBase path);
 }
 
 class MvcRouteAnyMatchLocation extends MvcRouteMatchedLocation {
   @override
-  MvcRouterParseContext consumeMatchedLocationInContext(MvcRouterParseContext context) {
-    return context.change();
+  MvcRouterMapPathBase consumeMatchedLocation(MvcRouterMapPathBase path) {
+    return path;
   }
 }
 
 class MvcRouteAllMatchLocation extends MvcRouteMatchedLocation {
   @override
-  MvcRouterParseContext consumeMatchedLocationInContext(MvcRouterParseContext context) {
-    return context.change(
-      mapData: MvcEmptyRouteMapData(),
-    );
+  MvcRouterMapPathBase consumeMatchedLocation(MvcRouterMapPathBase path) {
+    return MvcRouterEmptyPath();
   }
 }

@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_mvc_router/flutter_mvc_router.dart';
 
-abstract class MvcRouteMapDataBase {
-  MvcRouteMapDataBase({
-    this.branches,
-    this.branchCurrentIndex,
+abstract class MvcRouterMapPathBase {
+  MvcRouterMapPathBase({
     this.extraData,
+    required this.key,
   });
   T? args<T>() {
     if (this is T) {
@@ -15,20 +13,16 @@ abstract class MvcRouteMapDataBase {
     return null;
   }
 
-  LocalKey get key => ValueKey(this);
-  Uri get uri;
-  bool get isEmpty => false;
+  final LocalKey key;
   Completer? result;
-  int? branchCurrentIndex;
-  List<MvcRouteMapBase>? branches;
   dynamic extraData;
+  String serialization();
 
-  String serialization() {
-    return "MvcRouteMapData";
-  }
+  Uri? get uri;
+  bool get isEmpty => false;
 }
 
-mixin MvcRoutePathParameters on MvcRouteMapDataBase {
+mixin MvcRoutePathParameters on MvcRouterMapPathBase {
   Map<String, String> get pathParameters;
   @override
   T? args<T>() {
@@ -38,7 +32,7 @@ mixin MvcRoutePathParameters on MvcRouteMapDataBase {
     return super.args();
   }
 }
-mixin MvcRouteDicationaryParameters on MvcRouteMapDataBase {
+mixin MvcRouteDicationaryParameters on MvcRouterMapPathBase {
   Map<String, dynamic> get dicationaryArgs;
 
   @override
@@ -47,13 +41,13 @@ mixin MvcRouteDicationaryParameters on MvcRouteMapDataBase {
   }
 }
 
-extension MvcRouteMapDataParametersHelper on MvcRouteMapDataBase {
+extension MvcRouteMapDataParametersHelper on MvcRouterMapPathBase {
   String? pathParameter(String key) {
     return args<MvcRoutePathParameters>()?.pathParameters[key];
   }
 
   String? queryParameter(String key) {
-    return uri.queryParameters[key];
+    return uri?.queryParameters[key];
   }
 
   T? argsForKey<T>(String key) {

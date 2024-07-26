@@ -30,7 +30,7 @@ class MvcRouterSerializerManager extends ServiceObserver<RouteSerializerBase> wi
   @override
   void onServiceInitializeDone(RouteSerializerBase? service) {}
 
-  String serializationRouteMap<T extends MvcRouteMapBase>(T routeMap) {
+  String serializationRouteMap<T extends MvcRouterMapBase>(T routeMap) {
     RouteMapSerializer? serializer;
     for (var element in routeMapSerializers) {
       if (element is RouteMapSerializer<T>) {
@@ -45,7 +45,7 @@ class MvcRouterSerializerManager extends ServiceObserver<RouteSerializerBase> wi
     return "";
   }
 
-  String serializationRouteMapData<T extends MvcRouteMapDataBase>(T routeMapData) {
+  String serializationRouteMapData<T extends MvcRouterMapPathBase>(T routeMapData) {
     RouteMapDataSerializer? serializer;
     for (var element in routeMapDataSerializers) {
       if (element is RouteMapDataSerializer<T>) {
@@ -60,7 +60,7 @@ class MvcRouterSerializerManager extends ServiceObserver<RouteSerializerBase> wi
     return "";
   }
 
-  MvcRouteMapBase? deserializationRouteMap(String serializedData) {
+  MvcRouterMapBase? deserializationRouteMap(String serializedData) {
     for (var element in routeMapSerializers) {
       if (element.canDeserialization(serializedData)) {
         final data = element.deserialization(serializedData);
@@ -72,7 +72,7 @@ class MvcRouterSerializerManager extends ServiceObserver<RouteSerializerBase> wi
     return null;
   }
 
-  MvcRouteMapDataBase? deserializationRouteMapData(String serializedData) {
+  MvcRouterMapPathBase? deserializationRouteMapData(String serializedData) {
     for (var element in routeMapDataSerializers) {
       if (element.canDeserialization(serializedData)) {
         final data = element.deserialization(serializedData);
