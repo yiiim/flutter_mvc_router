@@ -17,8 +17,7 @@ class MvcRouteStack extends ValueNotifier<List<MvcRouteEntity>> implements MvcRo
     MvcRouteStack? branchParent,
     int? branchIndex,
   })  : _parent = parent,
-        _branchParent = branchParent,
-        _branchIndex = branchIndex;
+        _branchParent = branchParent;
   factory MvcRouteStack.fromResult(
     MvcRouterMapParseResult result,
     MvcRouterParser parser, {
@@ -50,7 +49,6 @@ class MvcRouteStack extends ValueNotifier<List<MvcRouteEntity>> implements MvcRo
   final MvcRouteStack? _parent;
   MvcRouteStack? _child;
   final MvcRouteStack? _branchParent;
-  final int? _branchIndex;
   List<MvcRouteStack>? _branchChildren;
   final List<MvcRouteEntity> _forwards = [];
   MvcRouteStack? branchActive;

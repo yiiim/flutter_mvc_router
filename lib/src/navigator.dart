@@ -194,6 +194,7 @@ class MvcNavigatorController extends MvcController<MvcRouterMapBase> with MvcRou
                   collection.add<MvcPage>((serviceProvider) => element.route.createPage());
                   collection.addSingleton((serviceProvider) => element.mapData);
                   collection.addSingleton((serviceProvider) => element);
+                  collection.addSingleton((serviceProvider) => element.route);
                   collection.addSingleton((serviceProvider) => MvcRouteInfo(route: element.route, routeData: element.mapData));
                   if (element.route is MvcBranchedRouteBase) {
                     final map = MvcRouterBasicMap([element.remainingPath ?? MvcRouterEmptyPath()]);

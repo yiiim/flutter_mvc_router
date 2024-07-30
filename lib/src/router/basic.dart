@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mvc/flutter_mvc.dart';
 import 'package:flutter_mvc_router/src/delegate.dart';
 import 'package:flutter_mvc_router/src/parser/map_parser.dart';
-import 'package:flutter_mvc_router/src/route_entity.dart';
+import 'package:flutter_mvc_router/src/route/route.dart';
 import 'package:flutter_mvc_router/src/route_map/map_data/base.dart';
 import 'package:flutter_mvc_router/src/route_operate.dart';
 import 'package:flutter_mvc_router/src/route_stack.dart';
@@ -15,8 +15,9 @@ mixin MvcBasicRouter on DependencyInjectionService {
   GlobalKey<NavigatorState> get navigatorKey => _currentRouteStack.key;
   GlobalKey<NavigatorState> get topNavigatorKey => _currentRouteStack.topStack.key;
 
+  MvcRouteBase get currentRoute => _currentRouteStack.currentRoute.route;
   bool get isCurrent {
-    return _currentRouteStack.isCurrent && _currentRouteStack.currentRoute == getService<MvcRouteEntity>();
+    return _currentRouteStack.isCurrent;
   }
 
   bool canPop() => _currentRouteStack.canPop();
