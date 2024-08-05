@@ -1,10 +1,5 @@
-import 'dart:async';
-
-import 'package:collection/collection.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../route_operate.dart';
 import '../serializer/map/default.dart';
 import 'base.dart';
 import 'map_data/base.dart';
@@ -36,40 +31,5 @@ class MvcRouterBasicMap extends MvcRouterMapBase {
       }
     }
     return null;
-  }
-
-  @override
-  Future<T?> operate<T>(MvcRouteOperate operate) {
-    switch (operate) {
-      case MvcRouteOperatePop(result: final result):
-        paths.removeLast().result?.complete(result);
-        break;
-      case MvcRouteOperatePush(mapData: final data):
-        Completer<T?> completer = Completer();
-        data.result = completer;
-        paths.add(data);
-        return completer.future;
-      case MvcRouteOperatePushReplacement(mapData: final data, result: final result):
-        paths.removeLast().result?.complete(result);
-        paths.add(data);
-        break;
-      case MvcRouteOperatePushAndRemoveUntil(mapData: final data, predicate: final predicate):
-        MvcRouterMapPathBase? candidate = paths.lastWhereOrNull((element) => predicate(element));
-        while (candidate != null) {
-          paths.remove(candidate..result?.complete(null));
-          candidate = paths.lastWhereOrNull((element) => predicate(element));
-        }
-        paths.add(data);
-        break;
-      case MvcRouteOperatePopUntil(predicate: final predicate):
-        MvcRouterMapPathBase? candidate = paths.lastWhereOrNull((element) => predicate(element));
-        while (candidate != null) {
-          paths.remove(candidate..result?.complete(null));
-          candidate = paths.lastWhereOrNull((element) => predicate(element));
-        }
-        break;
-      default:
-    }
-    return SynchronousFuture(null);
   }
 }

@@ -1,4 +1,3 @@
-import 'parser/map_parser.dart';
 import 'route_map/map_data/base.dart';
 
 abstract class MvcRouteOperate {}
@@ -13,30 +12,26 @@ class MvcRouteOperatePop extends MvcRouteOperate {
 }
 
 class MvcRouteOperateRedirect extends MvcRouteOperate {
-  MvcRouteOperateRedirect(this.mapData, {this.router});
+  MvcRouteOperateRedirect(this.mapData);
   final MvcRouterMapPathBase mapData;
-  final MvcRouterMapParser? router;
 }
 
 class MvcRouteOperatePush extends MvcRouteOperate {
-  MvcRouteOperatePush(this.mapData, {this.router});
+  MvcRouteOperatePush(this.mapData);
   final MvcRouterMapPathBase mapData;
-  final MvcRouterMapParser? router;
 }
 
 class MvcRouteOperatePushReplacement extends MvcRouteOperate {
-  MvcRouteOperatePushReplacement(this.mapData, {this.result, this.router});
+  MvcRouteOperatePushReplacement(this.mapData, {this.result});
   final dynamic result;
   final MvcRouterMapPathBase mapData;
-  final MvcRouterMapParser? router;
 }
 
 class MvcRouteOperatePushAndRemoveUntil extends MvcRouteOperate {
-  MvcRouteOperatePushAndRemoveUntil(this.mapData, this.predicate, {this.result, this.router});
+  MvcRouteOperatePushAndRemoveUntil(this.mapData, this.predicate, {this.result});
   final dynamic result;
   final MvcRouterMapPathBase mapData;
   final bool Function(MvcRouterMapPathBase) predicate;
-  final MvcRouterMapParser? router;
 }
 
 class MvcRouteOperatePopUntil extends MvcRouteOperate {

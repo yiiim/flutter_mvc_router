@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mvc/flutter_mvc.dart';
+import 'package:flutter_mvc_router/src/navigator.dart';
 
 import 'delegate.dart';
+import 'parser/map_parse_delegate.dart';
 import 'route_map/base.dart';
 import 'serializer/manager.dart';
 import 'route_stack.dart';
@@ -18,7 +20,7 @@ class MvcRouteInformationParser extends RouteInformationParser<MvcRouterMapBase>
     if (routeInformation.state is String) {
       final informationStringState = routeInformation.state as String;
       if (informationStringState.startsWith("MvcRouteInformationParser")) {
-        final serializedData = informationStringState.substring("MvcRouteInformationParser".length + 1);
+        final serializedData = informationStringState.substring("MvcRouteInformationParser".length);
         result = getService<MvcRouterSerializerManager>().deserializationRouteMap(serializedData);
         if (result != null) {
           restore = true;
@@ -33,8 +35,14 @@ class MvcRouteInformationParser extends RouteInformationParser<MvcRouterMapBase>
       }
     }
     if (result is! MvcRouteStack) {
+      MvcRouterMapParseDelegate? parserDelegate = context.tryGetMvcService<MvcNavigatorController>();
+      parserDelegate ??= getService<MvcRouterDelegate>();
       result = MvcRouteStack.fromResult(
-        await parser.parseRouteMap(result, restore: restore),
+        await parser.parseRouteMap(
+          result,
+          restore: restore,
+          mapParseDelegate: parserDelegate,
+        ),
         parser,
       );
     }

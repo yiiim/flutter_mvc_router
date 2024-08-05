@@ -1,12 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter_mvc/flutter_mvc.dart';
-
 import '../route_map/map_data/base.dart';
 import '../route_map/map_data/named.dart';
 import 'basic.dart';
 
-mixin MvcPathRouter on MvcBasicRouter, DependencyInjectionService {
+mixin MvcPathRouter on MvcBasicRouter {
   FutureOr<T?> pushNamed<T>(String name, {dynamic arguments}) {
     return pushRoute<T>(MvcRouterNamedPath.fromNamed(name, arguments));
   }

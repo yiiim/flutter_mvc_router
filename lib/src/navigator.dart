@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mvc/flutter_mvc.dart';
 import 'package:flutter_mvc_router/flutter_mvc_router.dart';
-import 'package:flutter_mvc_router/src/parser/map_parser.dart';
+import 'package:flutter_mvc_router/src/parser/map_parse_delegate.dart';
 import 'package:flutter_mvc_router/src/router/router.dart';
 
 import 'route_entity.dart';
@@ -28,8 +28,8 @@ class MvcNavigatorBranchController extends ValueNotifier<int> with DependencyInj
               branchParent: navigatorController,
               branchController: this,
               branchIndex: index,
+              initialMap: maps[index],
             ),
-            model: maps[index],
           );
         }
         return Container();
@@ -46,51 +46,103 @@ class MvcNavigatorBranchController extends ValueNotifier<int> with DependencyInj
   }
 }
 
-class MvcNavigatorController extends MvcController<MvcRouterMapBase> with MvcRouterMixinMapParser, MvcBasicRouter, MvcPathRouter, MvcPageRouter, MvcRouter {
+class MvcNavigatorController extends MvcController with MvcRouterMixinMapParseDelegate, MvcBasicRouter, MvcPathRouter, MvcPageRouter, MvcRouter, ChangeNotifier {
   MvcNavigatorController({
     MvcNavigatorController? parent,
     MvcNavigatorController? branchParent,
     MvcNavigatorBranchController? branchController,
+    required MvcRouterMapBase initialMap,
     int? branchIndex,
   })  : _parent = parent,
         _branchParent = branchParent,
         _branchController = branchController,
-        _branchIndex = branchIndex {
+        _branchIndex = branchIndex,
+        _initialMap = initialMap {
     if (branchController != null) {
       branchController.addListener(_branchActiveUpdate);
     }
   }
+  late final MvcRouterParser _parser = getService();
+  late final MvcRouteProvider _routeProvider = getService();
 
+  final MvcRouterMapBase _initialMap;
   final MvcNavigatorController? _parent;
   final MvcNavigatorController? _branchParent;
   final MvcNavigatorBranchController? _branchController;
   final int? _branchIndex;
   List<Page>? _pages;
-
-  bool _parsing = false;
-  @override
   MvcRouteStack? routeStack;
 
-  Future<T?> operate<T>(MvcRouteOperate operate) async => await routeStack?.operate<T>(operate);
+  @override
+  List<MvcRouteBase> get routes => _routeProvider.routes();
+  @override
+  MvcNavigatorController? get navigatorController => this;
 
-  Future _parseModel() async {
-    update(() => _parsing = true);
-    routeStack?.removeListener(_update);
+  Future replaceMap<T>(MvcRouterMapBase map) async {
+    return _parseMap(map);
+  }
+
+  Future<T?> operate<T>(MvcRouteOperate operate) async {
+    assert(routeStack != null);
+    final operateResult = switch (operate) {
+      MvcRouteOperateForward() => await routeStack!.forward(),
+      MvcRouteOperatePop(result: final result) => routeStack!.pop(result: result),
+      MvcRouteOperatePush(mapData: final data) => await routeStack!.push<T>(
+          MvcRouteEntity.fromResult(
+            await _parser.parseRouteMapData(
+              routeStack!,
+              data,
+              mapParseDelegate: this,
+            ),
+          ),
+        ),
+      MvcRouteOperatePushReplacement(mapData: final data) => await routeStack!.pushReplacement<T>(
+          MvcRouteEntity.fromResult(
+            await _parser.parseRouteMapData(
+              routeStack!,
+              data,
+              mapParseDelegate: this,
+            ),
+          ),
+        ),
+      MvcRouteOperatePushAndRemoveUntil(mapData: final data, predicate: final predicate) => await routeStack!.pushAndRemoveUntil<T>(
+          MvcRouteEntity.fromResult(
+            await _parser.parseRouteMapData(routeStack!, data, mapParseDelegate: this),
+          ),
+          (entity) => predicate(entity.mapData),
+        ),
+      MvcRouteOperatePopUntil(predicate: final predicate) => routeStack!.popUntil((entity) => predicate(entity.mapData)),
+      MvcRouteOperateRedirect(mapData: final data) => await routeStack!.redirect(
+          MvcRouteEntity.fromResult(
+            await _parser.parseRouteMapData(
+              routeStack!,
+              data,
+              mapParseDelegate: this,
+            ),
+          ),
+        ),
+      _ => null
+    };
+    if (operateResult is T) {
+      return operateResult;
+    }
+    return null;
+  }
+
+  Future _parseMap(MvcRouterMapBase map) async {
+    routeStack?.removeListener(_routeStackUpdate);
     routeStack = MvcRouteStack.fromResult(
-      await getService<MvcRouterParser>().parseRouteMap(
-        model,
-        mapParser: getService<MvcRouterMapParser>(),
-      ),
-      getService<MvcRouterParser>(),
+      await _parser.parseRouteMap(map, mapParseDelegate: this),
+      _parser,
       parent: _parent?.routeStack,
       branchParent: _branchParent?.routeStack,
       branchIndex: _branchIndex,
     );
-    routeStack?.addListener(_update);
+    routeStack?.addListener(_routeStackUpdate);
     if (_branchController != null && _branchParent != null && _branchIndex == _branchController?.value) {
       _branchParent?.routeStack?.branchActive = routeStack;
     }
-    update(() => _parsing = false);
+    _routeStackUpdate();
   }
 
   void _branchActiveUpdate() {
@@ -101,34 +153,38 @@ class MvcNavigatorController extends MvcController<MvcRouterMapBase> with MvcRou
     }
   }
 
-  @override
-  void didUpdateModel(MvcRouterMapBase oldModel) {
-    super.didUpdateModel(oldModel);
-    if (model != oldModel) {
-      _parseModel();
-    }
+  void _childUpdate() {
+    notifyListeners();
+  }
+
+  void _branchUpdate() {
+    notifyListeners();
+  }
+
+  void _routeStackUpdate() {
+    _update();
+    notifyListeners();
+    _parent?._childUpdate();
+    _branchParent?._branchUpdate();
   }
 
   @override
   void init() {
     super.init();
-    _parseModel();
+    _parseMap(_initialMap);
   }
 
   @override
   void initServices(ServiceCollection collection) {
     super.initServices(collection);
     collection.addSingleton<MvcRouter>((serviceProvider) => this);
-    collection.addSingleton<MvcRouterMapParser>((serviceProvider) => this);
+    collection.addSingleton<MvcRouterMapParseDelegate>((serviceProvider) => this);
   }
 
   @override
   MvcView<MvcController> view() {
     return MvcViewBuilder(
       (controller) {
-        if (_parsing) {
-          return const SizedBox.shrink();
-        }
         if (routeStack == null) {
           return const SizedBox.shrink();
         }
@@ -136,7 +192,7 @@ class MvcNavigatorController extends MvcController<MvcRouterMapBase> with MvcRou
           _update();
         }
         return MvcBuilder(
-          id: model.id,
+          id: routeStack!.id,
           classes: const ["mvc_navigator"],
           builder: (context) {
             return Column(
@@ -149,8 +205,7 @@ class MvcNavigatorController extends MvcController<MvcRouterMapBase> with MvcRou
                       if (!route.didPop(result)) {
                         return false;
                       }
-                      routeStack?.pop();
-                      return true;
+                      return routeStack?.pop() ?? true;
                     },
                   ),
                 ),
@@ -170,24 +225,23 @@ class MvcNavigatorController extends MvcController<MvcRouterMapBase> with MvcRou
           key: element.key ?? element.mapData.key,
           child: Builder(
             builder: (context) {
+              Widget? child;
+              if (element.remainingPath != null && !element.remainingPath!.isEmpty) {
+                child = Builder(
+                  builder: (context) {
+                    return Mvc(
+                      create: () => MvcNavigatorController(
+                        parent: this,
+                        initialMap: MvcRouterBasicMap([element.remainingPath!]),
+                      ),
+                    );
+                  },
+                );
+              }
               return MvcDependencyProvider(
                 child: MvcBuilder(
                   builder: (context) {
-                    if (element.remainingPath == null || element.remainingPath!.isEmpty) {
-                      return context.getService<MvcPage>().buildContent(context, null);
-                    } else {
-                      return context.getService<MvcPage>().buildContent(
-                        context,
-                        Builder(
-                          builder: (context) {
-                            return Mvc<MvcNavigatorController, MvcRouterMapBase>(
-                              create: () => MvcNavigatorController(parent: this),
-                              model: MvcRouterBasicMap([element.remainingPath!]),
-                            );
-                          },
-                        ),
-                      );
-                    }
+                    return context.getService<MvcPage>().buildContent(context, child);
                   },
                 ),
                 provider: (collection) {
@@ -195,17 +249,13 @@ class MvcNavigatorController extends MvcController<MvcRouterMapBase> with MvcRou
                   collection.addSingleton((serviceProvider) => element.mapData);
                   collection.addSingleton((serviceProvider) => element);
                   collection.addSingleton((serviceProvider) => element.route);
-                  collection.addSingleton((serviceProvider) => MvcRouteInfo(route: element.route, routeData: element.mapData));
+                  collection.addSingleton((serviceProvider) => MvcRouteInfo(route: element.route, routeData: element.mapData, child: child));
                   if (element.route is MvcBranchedRouteBase) {
                     final map = MvcRouterBasicMap([element.remainingPath ?? MvcRouterEmptyPath()]);
-                    List<MvcRouterMapBase> maps = (element.route as MvcBranchedRouteBase).branchesDefaultMap();
-                    final int? index = (element.route as MvcBranchedRouteBase).mapIndex(map);
-                    if (index != null) {
-                      maps[index] = map;
-                    }
+                    final (int index, List<MvcRouterMapBase> maps) = (element.route as MvcBranchedRouteBase).branchs(map);
                     collection.addSingleton(
                       (serviceProvider) => MvcNavigatorBranchController(
-                        index ?? 0,
+                        index,
                         maps: maps,
                         navigatorController: this,
                       ),

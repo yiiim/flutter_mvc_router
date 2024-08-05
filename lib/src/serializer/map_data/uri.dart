@@ -12,7 +12,7 @@ class MvcRouteUriMapDataSerializer extends RouteMapDataSerializer<MvcRouterUriPa
   @override
   MvcRouterUriPath? deserialization(dynamic serializedData) {
     try {
-      final data = jsonDecode((serializedData as String).substring("MvcRouteUriMapData:".length + 1));
+      final data = jsonDecode((serializedData as String).substring("MvcRouteUriMapData:".length));
       return MvcRouterUriPath(
         matchedPath: data["matchedPath"],
         remainingLocation: data["remainingLocation"],

@@ -11,8 +11,7 @@ abstract class MvcRouteBase {
 }
 
 abstract class MvcBranchedRouteBase {
-  List<MvcRouterMapBase> branchesDefaultMap();
-  int? mapIndex(MvcRouterMapBase map);
+  (int index, List<MvcRouterMapBase> branch) branchs(MvcRouterMapBase map);
 }
 
 class MvcNotFoundRoute extends MvcRouteBase {

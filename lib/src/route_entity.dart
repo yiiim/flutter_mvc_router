@@ -30,7 +30,7 @@ class MvcRouteEntity {
       location: result.location,
       remainingPath: result.remainingPath,
       key: result.key,
-      uri: result.mapData.uri,
+      uri: (result.mapData.uri ?? result.route.uri),
       id: result.id,
     );
   }
@@ -43,6 +43,7 @@ class MvcRouteEntity {
     LocalKey? key,
     String? id,
     Completer? result,
+    Uri? uri,
   }) {
     return MvcRouteEntity(
       mapData: mapData ?? this.mapData,
@@ -52,6 +53,7 @@ class MvcRouteEntity {
       key: key ?? this.key,
       id: id ?? this.id,
       result: result ?? this.result,
+      uri: uri ?? this.uri,
     );
   }
 }

@@ -7,22 +7,12 @@ class MvcRouterParseContext {
   MvcRouterParseContext({
     required this.map,
     required this.mapData,
-    this.userInfo = const {},
+    this.restore = false,
   });
   final MvcRouterMapBase map;
   final MvcRouterMapPathBase mapData;
-  final Map userInfo;
-
-  MvcRouterParseContext change({
-    MvcRouterMapPathBase? mapData,
-    List<MvcRouteBase>? routes,
-    Map? userInfo,
-  }) {
-    MvcRouterParseContext newContext = MvcRouterParseContext(
-      map: map,
-      mapData: mapData ?? this.mapData,
-      userInfo: userInfo ?? this.userInfo,
-    );
-    return newContext;
-  }
+  final bool restore;
+  List<MvcRouteBase> availableRoutes = [];
+  MvcRouteBase? notFoundRoute;
+  Map userInfo = {};
 }

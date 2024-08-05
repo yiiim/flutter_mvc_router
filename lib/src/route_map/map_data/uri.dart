@@ -56,6 +56,9 @@ class MvcRouterUriPath extends MvcRouterMapPathBase with MvcRoutePathParameters,
   }
 
   MvcRouterUriPath removeLocation(String localtion) {
+    if (localtion.isEmpty) {
+      return copyWith();
+    }
     final String newRemainingLocation = remainingLocation.substring(localtion.length, remainingLocation.length);
     return copyWith(
       remainingLocation: newRemainingLocation,
@@ -73,4 +76,7 @@ class MvcRouterUriPath extends MvcRouterMapPathBase with MvcRoutePathParameters,
         if (uri != null) ...uri!.queryParameters,
         ...pathParameters,
       };
+
+  @override
+  bool get isEmpty => remainingLocation.isEmpty;
 }

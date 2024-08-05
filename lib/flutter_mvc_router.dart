@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mvc/flutter_mvc.dart';
-import 'package:flutter_mvc_router/src/parser/map_parser.dart';
 
 import 'flutter_mvc_router.dart';
 
@@ -49,7 +48,6 @@ extension FlutterMvcRouter on ServiceCollection {
     addSingleton((serviceProvider) => MvcRouterDelegate());
     addSingleton((serviceProvider) => MvcRouteInformationProvider());
     addSingleton((serviceProvider) => MvcRouterParser());
-    addSingleton<MvcRouterMapParser>((serviceProvider) => serviceProvider.get<MvcRouterDelegate>());
     addSingleton<MvcRouter>((serviceProvider) => serviceProvider.get<MvcRouterDelegate>());
     addSingleton((serviceProvider) => MvcRouterSerializerManager());
     addSingleton((serviceProvider) => MvcNotFoundRoute());
@@ -71,7 +69,6 @@ extension FlutterMvcRouter on ServiceCollection {
       ),
       initializeWhenServiceProviderBuilt: true,
     );
-    addController((serviceProvider) => MvcNavigatorController());
   }
 
   void addMvcRouterMiddleware<T extends MvcRouterMiddleware>(T Function(ServiceProvider serviceProvider) factory) {

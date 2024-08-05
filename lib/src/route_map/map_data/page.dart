@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mvc/flutter_mvc.dart';
 
-import '../../route/page.dart';
 import 'uri.dart';
 
 class MvcRouterPagePath<T> extends MvcRouterUriPath {
@@ -13,7 +13,7 @@ class MvcRouterPagePath<T> extends MvcRouterUriPath {
     super.arguments,
     super.key,
   });
-  static MvcRouterPagePath fromController<T extends MvcPageController>({
+  static MvcRouterPagePath fromController<T extends MvcController>({
     dynamic arguments,
     String? path,
     LocalKey? key,

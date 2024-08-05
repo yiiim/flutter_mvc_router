@@ -1,46 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mvc/flutter_mvc.dart';
+import 'package:flutter_mvc_router/src/route_info.dart';
 
 import '../page.dart';
 import '../parser/context.dart';
-import '../route_info.dart';
 import '../route_map/map_data/page.dart';
-import '../router/basic.dart';
-import '../router/page.dart';
-import '../router/path.dart';
-import '../router/router.dart';
 import 'match_location/match_location.dart';
 import 'path.dart';
 
-class MvcPageModel {
-  const MvcPageModel({required this.routeInfo, this.child});
-  final MvcRouteInfo routeInfo;
-  final Widget? child;
-}
+class _MvcControllerRoutePage<TModelType, TControllerType extends MvcController<TModelType>> extends MvcPage {
+  _MvcControllerRoutePage({this.modelCreate, this.create});
 
-abstract class MvcPageControllerBase extends MvcController<MvcPageModel> {}
-
-abstract class MvcPageController extends MvcPageControllerBase with MvcBasicRouter, MvcPathRouter, MvcPageRouter, MvcRouter {
-  T? args<T>() => model.routeInfo.args<T>();
-  T? argsForKey<T>(String key) => model.routeInfo.argsForKey<T>(key);
-}
-
-class _MvcControllerRoutePage<T extends MvcPageController> extends MvcPage {
+  final TControllerType Function(MvcRouteInfo routeInfo)? create;
+  final TModelType Function(MvcRouteInfo routeInfo)? modelCreate;
   @override
   Widget buildContent(BuildContext context, Widget? child) {
-    return Mvc<T, MvcPageModel>(model: MvcPageModel(routeInfo: routeInfo, child: child));
+    return Mvc<TControllerType, TModelType>(
+      model: modelCreate?.call(routeInfo) as TModelType,
+      create: create == null ? null : () => create!.call(routeInfo),
+    );
   }
 }
 
-class MvcPageRoute<T extends MvcPageController> extends MvcPathRoute {
-  MvcPageRoute({String? path})
-      : super(
-          path: path ?? T.toString(),
-          pageFactory: () => _MvcControllerRoutePage<T>(),
+class MvcPageRoute<TModelType, TControllerType extends MvcController<TModelType>> extends MvcPathRoute {
+  MvcPageRoute({
+    String? path,
+    TControllerType Function(MvcRouteInfo routeInfo)? create,
+    final TModelType Function(MvcRouteInfo routeInfo)? modelCreate,
+  }) : super(
+          path: path ?? TControllerType.toString(),
+          pageFactory: () => _MvcControllerRoutePage<TModelType, TControllerType>(
+            modelCreate: modelCreate,
+            create: create,
+          ),
         );
   @override
   MvcRouteMatchedLocation? match(MvcRouterParseContext context) {
-    if (context.mapData is MvcRouterPagePath && (context.mapData as MvcRouterPagePath).controllerType == T) {
+    if (context.mapData is MvcRouterPagePath && (context.mapData as MvcRouterPagePath).controllerType == TControllerType) {
       return MvcRouteAllMatchLocation();
     }
     return super.match(context);

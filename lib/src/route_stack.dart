@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
+import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mvc_router/flutter_mvc_router.dart';
 import 'route_entity.dart';
@@ -43,7 +44,6 @@ class MvcRouteStack extends ValueNotifier<List<MvcRouteEntity>> implements MvcRo
     }
     return stack;
   }
-
   final MvcRouterParser parser;
   final MvcRouterMapBase map;
   final MvcRouteStack? _parent;
@@ -63,15 +63,15 @@ class MvcRouteStack extends ValueNotifier<List<MvcRouteEntity>> implements MvcRo
     }
   }
 
-  void _insertNewResult(MvcRouterMapPathParseResult entity, int index) {
+  void _insertNewResult(MvcRouteEntity entity, int index) {
     value.insert(
       index,
-      MvcRouteEntity.fromResult(entity),
+      entity,
     );
     notifyListeners();
   }
 
-  Future<T?> push<T>(MvcRouterMapPathParseResult route) {
+  Future<T?> push<T>(MvcRouteEntity route) {
     Completer<T?> completer = Completer();
     route.mapData.result = completer;
     _forwards.clear();
@@ -90,31 +90,43 @@ class MvcRouteStack extends ValueNotifier<List<MvcRouteEntity>> implements MvcRo
     return true;
   }
 
-  void forward() {
+  Future<T?> forward<T>() {
     if (_forwards.isNotEmpty) {
       final needForwardRoute = _forwards.removeLast();
+      final completer = Completer<T>();
       value.add(
         needForwardRoute.copyWith(
-          result: Completer(),
+          result: completer,
         ),
       );
       notifyListeners();
+      return completer.future;
     }
+    return Future.value(null);
   }
 
-  Future<T?> pushReplacement<T extends Object?>(MvcRouterMapPathParseResult newRoute, {Object? result}) {
+  Future<T?> pushReplacement<T extends Object?>(MvcRouteEntity newRoute, {Object? result}) {
     pop(result: result);
     return push(newRoute);
   }
 
-  Future<T?> pushAndRemoveUntil<T extends Object?>(MvcRouterMapPathParseResult newRoute, MvcRoutePredicate predicate) {
+  Future<T?> pushAndRemoveUntil<T extends Object?>(MvcRouteEntity newRoute, MvcRoutePredicate predicate) {
     value.removeWhere((element) => predicate(element));
     return push(newRoute);
   }
 
-  void popUntil(MvcRoutePredicate predicate) {
-    value.removeWhere((element) => predicate(element));
+  bool popUntil(MvcRoutePredicate predicate) {
+    final removed = value.where((element) => predicate(element));
+    for (var element in removed) {
+      value.remove(element);
+    }
     notifyListeners();
+    return removed.isNotEmpty;
+  }
+
+  Future<T?> redirect<T>(MvcRouteEntity route) {
+    value.clear();
+    return push(route);
   }
 
   bool canPop({
@@ -150,34 +162,6 @@ class MvcRouteStack extends ValueNotifier<List<MvcRouteEntity>> implements MvcRo
   }
 
   @override
-  Future<T?> operate<T>(MvcRouteOperate operate) async {
-    switch (operate) {
-      case MvcRouteOperateForward():
-        assert(_forwards.isNotEmpty);
-        forward();
-        break;
-      case MvcRouteOperatePop(result: final result):
-        pop(result: result);
-        break;
-      case MvcRouteOperatePush(mapData: final data, router: final router):
-        return push<T>(await parser.parseRouteMapData(this, data, mapParser: router));
-      case MvcRouteOperatePushReplacement(mapData: final data, router: final router):
-        return pushReplacement<T>(await parser.parseRouteMapData(this, data, mapParser: router));
-      case MvcRouteOperatePushAndRemoveUntil(mapData: final data, predicate: final predicate, router: final router):
-        return pushAndRemoveUntil<T>(await parser.parseRouteMapData(this, data, mapParser: router), (entity) => predicate(entity.mapData));
-      case MvcRouteOperatePopUntil(predicate: final predicate):
-        popUntil((entity) => predicate(entity.mapData));
-        break;
-      case MvcRouteOperateRedirect(mapData: final data, router: final router):
-        value.clear();
-        push(await parser.parseRouteMapData(this, data, mapParser: router));
-        break;
-      default:
-    }
-    return SynchronousFuture(null);
-  }
-
-  @override
   void notifyListeners() {
     super.notifyListeners();
     _parent?.notifyListeners();
@@ -195,16 +179,28 @@ class MvcRouteStack extends ValueNotifier<List<MvcRouteEntity>> implements MvcRo
 
   @override
   Uri? get uri {
+    Uri? effectiveUri;
     if (_child != null) {
-      return _child?.uri;
+      effectiveUri = _child?.uri;
     } else if (_branchChildren != null) {
-      return branchActive?.uri;
-    } else {
-      for (var element in value.reversed) {
-        if (element.uri != null) {
-          return element.uri;
-        }
-      }
+      effectiveUri = branchActive?.uri;
+    }
+    MvcRouteEntity? effectiveEntity = value.lastWhereOrNull((element) => element.uri != null);
+    Uri? selfUri = effectiveEntity?.uri?.replace(
+      queryParameters: effectiveEntity.mapData.args<Map<String, dynamic>>(),
+    );
+    if (selfUri != null && effectiveUri != null) {
+      return effectiveUri.replace(
+        path: join(
+          selfUri.path,
+          effectiveUri.path,
+        ),
+        queryParameters: effectiveEntity?.mapData.args<Map<String, dynamic>>(),
+      );
+    } else if (effectiveUri != null) {
+      return effectiveUri;
+    } else if (selfUri != null) {
+      return selfUri;
     }
     return Uri.parse("/");
   }
