@@ -40,7 +40,7 @@ export 'src/route_map/map_data/base.dart';
 export 'src/router/router.dart';
 
 extension FlutterMvcRouter on ServiceCollection {
-  void addMvcRouter({List<MvcRouteBase> routes = const []}) {
+  void addMvcRouter([List<MvcRouteBase>? routes]) {
     addSingleton<RouteInformationProvider>((serviceProvider) => serviceProvider.get<MvcRouteInformationProvider>());
     addSingleton<RouteInformationParser<MvcRouterMapBase>>((serviceProvider) => serviceProvider.get<MvcRouteInformationParser>());
     addSingleton<RouterDelegate>((serviceProvider) => serviceProvider.get<MvcRouterDelegate>(), initializeWhenServiceProviderBuilt: true);
@@ -51,6 +51,9 @@ extension FlutterMvcRouter on ServiceCollection {
     addSingleton<MvcRouter>((serviceProvider) => serviceProvider.get<MvcRouterDelegate>());
     addSingleton((serviceProvider) => MvcRouterSerializerManager());
     addSingleton((serviceProvider) => MvcNotFoundRoute());
+    if (routes != null) {
+      addSingleton<MvcRouteProvider>((serviceProvider) => MvcDefaultRouteProvider(routes: routes));
+    }
     addSingleton<RouteMapDataSerializer<MvcRouterUriPath>>(
       (serviceProvider) => MvcRouteUriMapDataSerializer(),
       initializeWhenServiceProviderBuilt: true,

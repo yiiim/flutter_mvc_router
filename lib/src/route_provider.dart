@@ -6,6 +6,13 @@ abstract class MvcRouteProvider {
   List<MvcRouteBase> routes();
 }
 
+class MvcDefaultRouteProvider extends MvcRouteProvider {
+  final List<MvcRouteBase> _routes;
+  MvcDefaultRouteProvider({required List<MvcRouteBase> routes}) : _routes = routes;
+  @override
+  List<MvcRouteBase> routes() => _routes;
+}
+
 class MvcRouteProviderWidget extends MvcStatefulWidget {
   final List<MvcRouteBase> routes;
   final Widget child;
