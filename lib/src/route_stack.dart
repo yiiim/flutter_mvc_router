@@ -14,17 +14,20 @@ class MvcRouteStack extends ValueNotifier<List<MvcRouteEntity>> implements MvcRo
     this.parser,
     this.map, {
     this.id,
+    GlobalKey<NavigatorState>? navigatorKey,
     MvcRouteStack? parent,
     MvcRouteStack? branchParent,
     int? branchIndex,
   })  : _parent = parent,
-        _branchParent = branchParent;
+        _branchParent = branchParent,
+        _navigatorKey = navigatorKey;
   factory MvcRouteStack.fromResult(
     MvcRouterMapParseResult result,
     MvcRouterParser parser, {
     MvcRouteStack? parent,
     MvcRouteStack? branchParent,
     int? branchIndex,
+    GlobalKey<NavigatorState>? key,
   }) {
     final stack = MvcRouteStack._(
       result.paths.map((e) => MvcRouteEntity.fromResult(e)).toList(),
@@ -34,6 +37,7 @@ class MvcRouteStack extends ValueNotifier<List<MvcRouteEntity>> implements MvcRo
       parent: parent,
       branchParent: branchParent,
       branchIndex: branchIndex,
+      navigatorKey: key,
     );
     if (parent != null) {
       parent._child = stack;
@@ -47,6 +51,7 @@ class MvcRouteStack extends ValueNotifier<List<MvcRouteEntity>> implements MvcRo
   final MvcRouterParser parser;
   final MvcRouterMapBase map;
   final MvcRouteStack? _parent;
+  final GlobalKey<NavigatorState>? _navigatorKey;
   MvcRouteStack? _child;
   final MvcRouteStack? _branchParent;
   List<MvcRouteStack>? _branchChildren;
@@ -172,7 +177,7 @@ class MvcRouteStack extends ValueNotifier<List<MvcRouteEntity>> implements MvcRo
   final String? id;
 
   @override
-  GlobalKey<NavigatorState> get key => map.key;
+  GlobalKey<NavigatorState> get key => _navigatorKey ?? map.key;
 
   @override
   List<MvcRouterMapPathBase> get paths => map.paths;

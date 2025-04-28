@@ -46,7 +46,8 @@ class MvcNavigatorBranchController extends ValueNotifier<int> with DependencyInj
   }
 }
 
-class MvcNavigatorController extends MvcController with MvcRouterMixinMapParseDelegate, MvcBasicRouter, MvcPathRouter, MvcPageRouter, MvcRouter, ChangeNotifier {
+class MvcNavigatorController extends MvcController
+    with MvcRouterMixinMapParseDelegate, MvcBasicRouter, MvcPathRouter, MvcPageRouter, MvcRouter, ChangeNotifier {
   MvcNavigatorController({
     MvcNavigatorController? parent,
     MvcNavigatorController? branchParent,
@@ -105,13 +106,15 @@ class MvcNavigatorController extends MvcController with MvcRouterMixinMapParseDe
             ),
           ),
         ),
-      MvcRouteOperatePushAndRemoveUntil(mapData: final data, predicate: final predicate) => await routeStack!.pushAndRemoveUntil<T>(
+      MvcRouteOperatePushAndRemoveUntil(mapData: final data, predicate: final predicate) =>
+        await routeStack!.pushAndRemoveUntil<T>(
           MvcRouteEntity.fromResult(
             await _parser.parseRouteMapData(routeStack!, data, mapParseDelegate: this),
           ),
           (entity) => predicate(entity.mapData),
         ),
-      MvcRouteOperatePopUntil(predicate: final predicate) => routeStack!.popUntil((entity) => predicate(entity.mapData)),
+      MvcRouteOperatePopUntil(predicate: final predicate) =>
+        routeStack!.popUntil((entity) => predicate(entity.mapData)),
       MvcRouteOperateRedirect(mapData: final data) => await routeStack!.redirect(
           MvcRouteEntity.fromResult(
             await _parser.parseRouteMapData(
@@ -137,6 +140,7 @@ class MvcNavigatorController extends MvcController with MvcRouterMixinMapParseDe
       parent: _parent?.routeStack,
       branchParent: _branchParent?.routeStack,
       branchIndex: _branchIndex,
+      key: routeStack?.key,
     );
     routeStack?.addListener(_routeStackUpdate);
     if (_branchController != null && _branchParent != null && _branchIndex == _branchController?.value) {
@@ -249,10 +253,12 @@ class MvcNavigatorController extends MvcController with MvcRouterMixinMapParseDe
                   collection.addSingleton((serviceProvider) => element.mapData);
                   collection.addSingleton((serviceProvider) => element);
                   collection.addSingleton((serviceProvider) => element.route);
-                  collection.addSingleton((serviceProvider) => MvcRouteInfo(route: element.route, routeData: element.mapData, child: child));
+                  collection.addSingleton((serviceProvider) =>
+                      MvcRouteInfo(route: element.route, routeData: element.mapData, child: child));
                   if (element.route is MvcBranchedRouteBase) {
                     final map = MvcRouterBasicMap([element.remainingPath ?? MvcRouterEmptyPath()]);
-                    final (int index, List<MvcRouterMapBase> maps) = (element.route as MvcBranchedRouteBase).branchs(map);
+                    final (int index, List<MvcRouterMapBase> maps) =
+                        (element.route as MvcBranchedRouteBase).branchs(map);
                     collection.addSingleton(
                       (serviceProvider) => MvcNavigatorBranchController(
                         index,

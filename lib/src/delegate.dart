@@ -19,6 +19,7 @@ import 'router/router.dart';
 
 class MvcRouterDelegate extends RouterDelegate<MvcRouterMapBase> with DependencyInjectionService, MvcRouterMixinMapParseDelegate, MvcBasicRouter, MvcPathRouter, MvcPageRouter, MvcRouter, ChangeNotifier {
   late final MvcRouterParser parser = getService<MvcRouterParser>();
+  final GlobalKey _rootKey = GlobalKey();
   late MvcRouterMapBase rootRouteMap = MvcRouterBasicMap(
     [
       MvcRouterUriPath.fromUri(
@@ -38,6 +39,7 @@ class MvcRouterDelegate extends RouterDelegate<MvcRouterMapBase> with Dependency
   @override
   Widget build(BuildContext context) {
     return Mvc(
+      key: _rootKey,
       create: () {
         final controller = MvcNavigatorController(initialMap: rootRouteMap);
         _rootNavigatorController?.removeListener(notifyListeners);
