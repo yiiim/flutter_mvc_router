@@ -245,7 +245,7 @@ class MvcNavigatorController extends MvcController
               return MvcDependencyProvider(
                 child: MvcBuilder(
                   builder: (context) {
-                    return context.getService<MvcPage>().buildContent(context, child);
+                    return context.getMvcService<MvcPage>().buildContent(context, child);
                   },
                 ),
                 provider: (collection) {
