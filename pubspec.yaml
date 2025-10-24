@@ -14,6 +14,10 @@ dependencies:
   collection: ^1.18.0
   path: ^1.9.0
 
+dependency_overrides: 
+  flutter_mvc:
+    path: ../flutter_mvc
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

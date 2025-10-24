@@ -35,7 +35,7 @@ class MvcRouteInformationParser extends RouteInformationParser<MvcRouterMapBase>
       }
     }
     if (result is! MvcRouteStack) {
-      MvcRouterMapParseDelegate? parserDelegate = context.tryGetMvcService<MvcNavigatorController>();
+      MvcRouterMapParseDelegate? parserDelegate = context.tryGetService<MvcNavigatorController>();
       parserDelegate ??= getService<MvcRouterDelegate>();
       result = MvcRouteStack.fromResult(
         await parser.parseRouteMap(
