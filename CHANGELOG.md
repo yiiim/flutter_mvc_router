@@ -1,3 +1,7 @@
+## 2.0.0
+
+* Update to flutter_mvc 5.0.0
+
 ## 2.0.0-dev.1
 
 * Update to flutter_mvc 5.0.0

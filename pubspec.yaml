@@ -1,6 +1,6 @@
 name: flutter_mvc_router
 description: flutter_mvc's router.
-version: 2.0.0-dev.1
+version: 2.0.0
 homepage: https://github.com/yiiim/flutter_mvc_router
 
 environment:
@@ -10,13 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_mvc: ^5.0.0-dev.1
+  flutter_mvc: ^5.0.0
   collection: ^1.18.0
   path: ^1.9.0
 
-dependency_overrides: 
-  flutter_mvc:
-    path: ../flutter_mvc
 
 dev_dependencies:
   flutter_test:
