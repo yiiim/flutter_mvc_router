@@ -8,15 +8,15 @@ import 'route_entity.dart';
 class MvcNavigatorBranchController extends ValueNotifier<int> with DependencyInjectionService {
   MvcNavigatorBranchController(
     super.value, {
-    required this.maps,
+    required this.initialMaps,
     required this.navigatorController,
-  }) : _branchActive = List.generate(maps.length, (index) => index == value);
+  }) : _branchActive = List.generate(initialMaps.length, (index) => index == value);
   MvcNavigatorController navigatorController;
-  final List<MvcRouterMapBase> maps;
-  MvcRouterMapBase get currentMap => maps[value];
-  int get branchCount => maps.length;
+  final List<MvcRouterMapBase> initialMaps;
+  MvcRouterMapBase get currentMap => initialMaps[value];
+  int get branchCount => initialMaps.length;
   final List<bool> _branchActive;
-  List<MvcRouterMapPathBase> branchDataAt(int index) => maps[index].paths;
+  List<MvcRouterMapPathBase> branchDataAt(int index) => initialMaps[index].paths;
   Widget buildBranch(int index) {
     return MvcWidgetScopeBuilder(
       id: "#branch_$index",
@@ -27,7 +27,7 @@ class MvcNavigatorBranchController extends ValueNotifier<int> with DependencyInj
               branchParent: navigatorController,
               branchController: this,
               branchIndex: index,
-              initialMap: maps[index],
+              initialMap: initialMaps[index],
             ),
           );
         }
@@ -252,13 +252,14 @@ class MvcNavigatorController extends MvcController with MvcRouterMixinMapParseDe
                   collection.addSingleton((serviceProvider) => MvcRouteInfo(route: element.route, routeData: element.mapData, child: child));
                   if (element.route is MvcBranchedRouteBase) {
                     final map = MvcRouterBasicMap([element.remainingPath ?? MvcRouterEmptyPath()]);
-                    final (int index, List<MvcRouterMapBase> maps) = (element.route as MvcBranchedRouteBase).branchs(map);
+                    final (int index, List<MvcRouterMapBase> initialMap) = (element.route as MvcBranchedRouteBase).branchs(map);
                     collection.addSingleton(
                       (serviceProvider) => MvcNavigatorBranchController(
                         index,
-                        maps: maps,
+                        initialMaps: initialMap,
                         navigatorController: this,
                       ),
+                      initializeWhenServiceProviderBuilt: true,
                     );
                   }
                 },

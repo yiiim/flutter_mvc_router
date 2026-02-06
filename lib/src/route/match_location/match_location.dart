@@ -18,3 +18,10 @@ class MvcRouteAllMatchLocation extends MvcRouteMatchedLocation {
     return MvcRouterEmptyPath();
   }
 }
+
+class MvcRouterNoMatchLocalMatchLocation extends MvcRouteMatchedLocation {
+  @override
+  MvcRouterMapPathBase consumeMatchedLocation(MvcRouterMapPathBase path) {
+    return path;
+  }
+}
